@@ -54,8 +54,12 @@ class Board
      */
     public function getState()
     {
-        return app('session')->get('board_state');
-        // return $_SESSION['board_state'];
+        // return app('session')->get('board_state');
+        if (! isset($_SESSION['board_state'])) {
+            $_SESSION['board_state'] = $this->create();
+        }
+        
+        return $_SESSION['board_state'];
     }
 
     /**
@@ -68,8 +72,9 @@ class Board
     {
         $this->validateSubmittedBoardState($board_state);
 
-        app('session')->put('board_state', $board_state);
-        // $_SESSION['board_state'] = $board_state;
+        // app('session')->put('board_state', $board_state);
+        $_SESSION['board_state'] = $board_state;
+
         return $board_state;
     }
 

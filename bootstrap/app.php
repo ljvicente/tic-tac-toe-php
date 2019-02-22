@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 require_once __DIR__.'/../vendor/autoload.php';
 
 try {
@@ -48,6 +50,10 @@ $app->singleton(
     App\Console\Kernel::class
 );
 
+$app->singleton(Illuminate\Session\SessionManager::class, function () use ($app) {
+    return new Illuminate\Session\SessionManager($app);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -67,6 +73,10 @@ $app->singleton(
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
 
+$app->middleware([
+    \Illuminate\Session\Middleware\StartSession::class,
+]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
@@ -77,6 +87,13 @@ $app->singleton(
 | totally optional, so you are not required to uncomment this line.
 |
 */
+
+$app->bind(\Illuminate\Session\SessionManager::class, function () use ($app) {
+    return new \Illuminate\Session\SessionManager($app);
+});
+
+$app->configure('session');
+$app->register(\Illuminate\Session\SessionServiceProvider::class);
 
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
@@ -94,9 +111,9 @@ $app->singleton(
 */
 
 $app->router->group([
-    'namespace' => 'App\Http\Controllers',
+    'namespace' => 'TicTacToe\Http',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__.'/../src/ljvicente/TicTacToe/Http/routes.php';
 });
 
 return $app;

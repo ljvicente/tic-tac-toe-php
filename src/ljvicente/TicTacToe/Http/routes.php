@@ -1,15 +1,17 @@
 <?php
 
 $router->get('/', function () {
-    app('session')->put('name', rand());
-
-    // dd(app('session')->get('name'));
+    echo "<a href='game.html'>Click Here To Play</a>";
 });
 
-$router->get('/board', function () use ($router) {
-    return [
-        ['', '', ''],
-        ['', '', ''],
-        ['', '', ''],
-    ];
-});
+// start new game
+$router->get('/start', 'GameController@start');
+
+// get state
+$router->get('/get-state', 'GameController@getBoardState');
+
+// submit move
+$router->post('/submit-move', 'GameController@submitMove');
+
+// get status
+$router->get('/get-status', 'GameController@getStatus');

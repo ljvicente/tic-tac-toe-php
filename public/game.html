@@ -42,6 +42,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
     <script>
         var app = new Vue({
             el: '#app',
@@ -90,8 +91,26 @@
                         self.status = response.data.status
                         self.winner = response.data.winner
 
-                        if (self.status == 'won') {
-                            alert('Winner: ' + self.winner)
+                        if (self.status == 'won' && self.winner == 'O') {
+                            // alert('You lost!')
+
+                            Swal.fire({
+                                title: 'Game Over!',
+                                text: 'You just lost to a bot',
+                                type: 'error',
+                                confirmButtonText: 'That is not cool'
+                            })
+                        }
+
+                        if (self.status == 'won' && self.winner == 'X') {
+                            // alert('You won!')
+
+                            Swal.fire({
+                                title: 'Victory!',
+                                text: 'You just beat a computer',
+                                type: 'success',
+                                confirmButtonText: 'Nice'
+                            })
                         }
 
                         if (self.status == 'draw') {

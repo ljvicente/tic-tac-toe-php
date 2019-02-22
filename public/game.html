@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PHP Tic Tac Toe</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.css">
+    <style>
+    .game-board {
+        height: 300px;
+        width: 300px;
+        border: 1px solid #ddd;
+    }
+    .game-board td {
+        border: 1px solid #ddd;
+        width: 100px;
+        height: 100px;
+        font-size: 30px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <article class="message">
+            <div class="message-header">
+                <p>PHP Tic Tac Toe</p>
+            </div>
+            <div class="message-body">
+                <table class="table game-board">
+                    <tr v-for="(row, rowIndex) in gameState">
+                        <td v-for="(cell, cellIndex) in row" v-html="cell" v-on:click="submitMove(rowIndex, cellIndex)"></td>
+                    </tr>
+                </table>
+                <button class="button is-primary" v-on:click="startNewGame">Start New Game</button>
+            </div>
+        </article>
+        
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                status: null,
+                winner: null,
+                gameState: [
+                    ['', '', ''],
+                    ['', '', ''],
+                    ['', '', '']
+                ]
+            },
+            methods: {
+                getState() {
+                    let self = this
+
+                    
+                },
+                startNewGame() {
+                    let self = this
+
+                    let c = confirm('Do you want to reset the game?')
+
+                    if (c) {
+                        axios.get('/start').then((response) => {
+                            self.gameState = response.data
+                        })
+                    }
+                },
+                submitMove(x, y) {
+                    let self = this
+                    
+                    axios.post('/submit-move', {
+                        x: x,
+                        y: y,
+                        unit: "X"
+                    }).then((response) => {
+                        self.gameState = response.data
+                        self.getStatus()
+                    })
+                },
+                getStatus() {
+                    let self = this
+
+                    axios.get('/get-status').then((response) => {
+                        self.status = response.data.status
+                        self.winner = response.data.winner
+
+                        if (self.status == 'won') {
+                            alert('Winner: ' + self.winner)
+                        }
+
+                        if (self.status == 'draw') {
+                            alert('Game is draw')
+                        }
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+</html>

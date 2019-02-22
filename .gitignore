@@ -1,5 +1,7 @@
 /vendor
 /.idea
+storage/framework/sessions/*
+!storage/framework/sessions/.gitkeep
 Homestead.json
 Homestead.yaml
 .env

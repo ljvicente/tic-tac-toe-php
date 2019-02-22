@@ -115,7 +115,12 @@
                         }
 
                         if (self.status == 'draw') {
-                            alert('Game is draw')
+                            Swal.fire({
+                                title: 'It\'s a draw!',
+                                text: 'Fair and square',
+                                type: 'warning',
+                                confirmButtonText: 'That is not cool'
+                            })
                         }
                     })
                 }

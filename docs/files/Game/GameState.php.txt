@@ -1,0 +1,136 @@
+<?php
+
+namespace TicTacToe\Game;
+
+use TicTacToe\Exceptions\InvalidBoardStateException;
+
+/**
+ * State of the game.
+ * 
+ * @author Leo <hello@lei.ph>
+ */
+class GameState
+{
+    /**
+     * Get player positions on a board.
+     *
+     * @param array $board_state
+     * @param string $unit
+     * @return array
+     */
+    public function getPlayerPositions($board_state, $unit)
+    {
+        $positions = [];
+
+        foreach ($board_state as $row_number => $row) {
+            foreach ($row as $column_number => $value) {
+                if ($value == $unit) {
+                    $positions[] = [$row_number, $column_number];
+                }
+            }
+        }
+
+        sort($positions);
+
+        return $positions;
+    }
+
+    /**
+     * Checks if the game is won.
+     * Returns player if won, false if not.
+     *
+     * @param array $board_state
+     * @return mixed
+     */
+    public function isGameWon($board_state)
+    {
+        $x_positions = $this->getPlayerPositions($board_state, 'X');
+        $o_positions = $this->getPlayerPositions($board_state, 'O');
+        $winning_combinations = $this->getWinningCombinations();
+        
+        foreach ($winning_combinations as $winning_combination) {
+            $x = 0;
+            $o = 0;
+
+            foreach ($winning_combination as $position) {
+                if (in_array($position, $x_positions)) {
+                    $x++;
+                }
+
+                if (in_array($position, $o_positions)) {
+                    $o++;
+                }
+            }
+
+            if ($x >= 3) {
+                return 'X';
+            }
+
+            if ($o >= 3) {
+                return 'O';
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if game is draw.
+     *
+     * @param array $board_state
+     * @return boolean
+     */
+    public function isGameDraw($board_state)
+    {
+        foreach ($board_state as $row_number => $row) {
+            foreach ($row as $column_number => $value) {
+                if ($value == '') {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get winning combinations.
+     *
+     * @return array
+     */
+    private function getWinningCombinations()
+    {
+        $winning_combinations = [];
+
+        // horizontal/vertical combinations
+        for ($row = 0; $row < 3; $row++) {
+            $winning_combinations[] = [
+                [$row, 0],
+                [$row, 1],
+                [$row, 2]
+            ];
+
+            $winning_combinations[] = [
+                [0, $row],
+                [1, $row],
+                [2, $row]
+            ];
+        }
+        
+        // diagonal combinations
+        $winning_combinations[] = [
+            [0, 0],
+            [1, 1],
+            [2, 2]
+        ];
+
+        $winning_combinations[] = [
+            [2, 0],
+            [1, 1],
+            [0, 2]
+        ];
+        
+        return $winning_combinations;
+    }
+}
+

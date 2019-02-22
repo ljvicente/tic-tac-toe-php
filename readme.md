@@ -20,3 +20,5 @@ To play the game on localhost:8000
 ```bash
 $ php -S localhost:8000 -t public
 ```
+
+For more information about the API, check `docs/index.html`

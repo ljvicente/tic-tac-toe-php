@@ -82,6 +82,8 @@ class GameController extends BaseController
         $unit = $request->get('unit');
         
         try {
+            $current_board_state = null;
+            
             if (! $this->game_state->isGameDraw($this->board_state) && ! $this->game_state->isGameWon($this->board_state)) {
                 // human move
                 $next_board_state = $this->move->makeMove($this->board_state, [$x, $y], $unit);

@@ -60,7 +60,16 @@
                 getState() {
                     let self = this
 
-                    
+                    axios.get('/get-state').then((response) => {
+                        self.gameState = response.data
+                    })
+                },
+                clearBoard() {
+                    let self = this
+
+                    axios.get('/start').then((response) => {
+                        self.gameState = response.data
+                    })
                 },
                 startNewGame() {
                     let self = this
@@ -68,9 +77,7 @@
                     let c = confirm('Do you want to reset the game?')
 
                     if (c) {
-                        axios.get('/start').then((response) => {
-                            self.gameState = response.data
-                        })
+                        self.clearBoard()
                     }
                 },
                 submitMove(x, y) {
@@ -124,6 +131,11 @@
                         }
                     })
                 }
+            },
+            mounted() {
+                let self = this
+
+                self.clearBoard()
             }
         })
     </script>

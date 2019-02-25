@@ -61,6 +61,9 @@
                     let self = this
 
                     axios.get('/get-state').then((response) => {
+                        if (typeof response.data.error !== 'undefined') {
+                            return self.handleError(response.data.error)
+                        }
                         self.gameState = response.data
                     })
                 },
@@ -68,6 +71,9 @@
                     let self = this
 
                     axios.get('/start').then((response) => {
+                        if (typeof response.data.error !== 'undefined') {
+                            return self.handleError(response.data.error)
+                        }
                         self.gameState = response.data
                     })
                 },
@@ -78,16 +84,27 @@
 
                     if (c) {
                         self.clearBoard()
+                        self.status = null
+                        self.winner = null
                     }
                 },
                 submitMove(x, y) {
                     let self = this
                     
+                    if (self.winner != null) {
+                        return self.handleError("Game is already over.")
+                    }
+
                     axios.post('/submit-move', {
                         x: x,
                         y: y,
                         unit: "X"
                     }).then((response) => {
+
+                        if (typeof response.data.error !== 'undefined') {
+                            return self.handleError(response.data.error)
+                        }
+
                         self.gameState = response.data
                         self.getStatus()
                     })
@@ -98,6 +115,10 @@
                     axios.get('/get-status').then((response) => {
                         self.status = response.data.status
                         self.winner = response.data.winner
+
+                        if (typeof response.data.error !== 'undefined') {
+                            return self.handleError(response.data.error)
+                        }
 
                         if (self.status == 'won' && self.winner == 'O') {
                             // alert('You lost!')
@@ -130,11 +151,22 @@
                             })
                         }
                     })
+                },
+                handleError(msg) {
+                    console.log(msg)
+                    Swal.fire({
+                        title: 'Error',
+                        text: msg,
+                        type: 'info',
+                        confirmButtonText: 'Close'
+                    })
+
+                    return false
                 }
             },
             mounted() {
                 let self = this
-
+                
                 self.clearBoard()
             }
         })

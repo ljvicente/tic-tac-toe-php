@@ -39,11 +39,17 @@ class GameController extends BaseController
      */
     public function start(Request $request)
     {
-        $new_board_state = $this->board->create();
-        
-        $this->board->setState($new_board_state);
+        try {
+            $new_board_state = $this->board->create();
 
-        return $new_board_state;
+            $this->board->setState($new_board_state);
+
+            return $new_board_state;
+        } catch (\Exception $e) {
+            return [
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     /**
@@ -54,7 +60,13 @@ class GameController extends BaseController
      */
     public function getBoardState(Request $request)
     {
-        return $this->board_state;
+        try {
+            return $this->board_state;
+        } catch (\Exception $e) {
+            return [
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     /**
@@ -69,20 +81,26 @@ class GameController extends BaseController
         $y = $request->get('y');
         $unit = $request->get('unit');
         
-        if (! $this->game_state->isGameDraw($this->board_state) && ! $this->game_state->isGameWon($this->board_state)) {
-            // human move
-            $next_board_state = $this->move->makeMove($this->board_state, [$x, $y], $unit);
-            $current_board_state = $this->board->setState($next_board_state);
+        try {
+            if (! $this->game_state->isGameDraw($this->board_state) && ! $this->game_state->isGameWon($this->board_state)) {
+                // human move
+                $next_board_state = $this->move->makeMove($this->board_state, [$x, $y], $unit);
+                $current_board_state = $this->board->setState($next_board_state);
+            }
+    
+            if (! $this->game_state->isGameDraw($current_board_state) && ! $this->game_state->isGameWon($current_board_state)) {
+                // bot move
+                $bot_move = $this->botMove($current_board_state, 'O');
+                $next_board_state = $this->move->makeMove($current_board_state, [$bot_move[0], $bot_move[1]], $bot_move[2]);
+                $current_board_state = $this->board->setState($next_board_state);
+            }
+            return $this->board->getState();
+        } catch (\Exception $e) {
+            return [
+                'error' => $e->getMessage(),
+            ];
         }
-
-        if (! $this->game_state->isGameDraw($current_board_state) && ! $this->game_state->isGameWon($current_board_state)) {
-            // bot move
-            $bot_move = $this->botMove($current_board_state, 'O');
-            $next_board_state = $this->move->makeMove($current_board_state, [$bot_move[0], $bot_move[1]], $bot_move[2]);
-            $current_board_state = $this->board->setState($next_board_state);
-        }
-
-        return $this->board->getState();
+        
     }
 
     /**
@@ -104,23 +122,29 @@ class GameController extends BaseController
      */
     public function getStatus()
     {
-        $board_state = $this->board_state;
-        $status = null;
-        $winner = null;
+        try {
+            $board_state = $this->board_state;
+            $status = null;
+            $winner = null;
 
-        if ($this->game_state->isGameDraw($board_state)) {
-            $status = 'draw';
+            if ($this->game_state->isGameDraw($board_state)) {
+                $status = 'draw';
+            }
+
+            $won = $this->game_state->isGameWon($board_state);
+            if ($won) {
+                $status = 'won';
+                $winner = $won;
+            }
+
+            return [
+                'status' => $status,
+                'winner' => $winner,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => $e->getMessage(),
+            ];
         }
-
-        $won = $this->game_state->isGameWon($board_state);
-        if ($won) {
-            $status = 'won';
-            $winner = $won;
-        }
-
-        return [
-            'status' => $status,
-            'winner' => $winner,
-        ];
     }
 }
